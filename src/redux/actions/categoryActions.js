@@ -1,4 +1,3 @@
-// src/redux/actions/categoryActions.js
 import axios from "axios";
 import {
   setCategories,
@@ -8,7 +7,7 @@ import {
   setError,
 } from "../slices/categorySlice";
 
-const DB_URL = import.meta.env.VITE_FIREBASE_DB_URL; // e.g. https://your-project.firebaseio.com
+const DB_URL = import.meta.env.VITE_DB_URL;
 
 // ✅ Get All Categories
 export const fetchCategories = (idToken, userId) => async (dispatch) => {
