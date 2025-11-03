@@ -13,8 +13,10 @@ const DB_URL = import.meta.env.VITE_DB_URL;
 export const fetchCategories = (idToken, userId) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    const res = await axios.get(`${DB_URL}/categories/${userId}.json?auth=${idToken}`);
-    const data = res.data ? Object.keys(res.data).map((key) => ({ id: key, ...res.data[key] })) : [];
+    const res = await axios.get(`${DB_URL}/${userId}/categories.json?auth=${idToken}`);
+    const data = res.data
+      ? Object.keys(res.data).map((key) => ({ id: key, ...res.data[key] }))
+      : [];
     dispatch(setCategories(data));
   } catch (err) {
     dispatch(setError(err.message));
@@ -27,7 +29,7 @@ export const fetchCategories = (idToken, userId) => async (dispatch) => {
 export const createCategory = (idToken, userId, name) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    const res = await axios.post(`${DB_URL}/categories/${userId}.json?auth=${idToken}`, { name });
+    const res = await axios.post(`${DB_URL}/${userId}/categories.json?auth=${idToken}`, { name });
     dispatch(addCategory({ id: res.data.name, name }));
   } catch (err) {
     dispatch(setError(err.message));
@@ -40,7 +42,7 @@ export const createCategory = (idToken, userId, name) => async (dispatch) => {
 export const deleteCategory = (idToken, userId, id) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    await axios.delete(`${DB_URL}/categories/${userId}/${id}.json?auth=${idToken}`);
+    await axios.delete(`${DB_URL}/${userId}/categories/${id}.json?auth=${idToken}`);
     dispatch(removeCategory(id));
   } catch (err) {
     dispatch(setError(err.message));
