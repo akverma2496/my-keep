@@ -17,6 +17,11 @@ const categorySlice = createSlice({
     removeCategory: (state, action) => {
       state.categories = state.categories.filter((cat) => cat.id !== action.payload);
     },
+    updateCategory: (state, action) => {
+      const { id, name } = action.payload;
+      const index = state.categories.findIndex((c) => c.id === id);
+      if (index !== -1) state.categories[index].name = name;
+    },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -30,6 +35,7 @@ export const {
   setCategories,
   addCategory,
   removeCategory,
+  updateCategory,
   setLoading,
   setError,
 } = categorySlice.actions;

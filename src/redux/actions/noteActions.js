@@ -1,78 +1,71 @@
-import axios from "axios";
+import { toast } from "react-toastify";
+import {
+  getNotes,
+  addNoteAPI,
+  updateNoteAPI,
+  deleteNoteAPI,
+} from "../../services/firebaseNoteAPI";
 import {
   setNotes,
   addNote,
   removeNote,
-  //updateNote as updateNoteSlice,
+  updateNote,
   setLoading,
   setError,
 } from "../slices/noteSlice";
 
-const DB_URL = import.meta.env.VITE_DB_URL;
-
-// ✅ Fetch Notes for a Category
 export const fetchNotes = (idToken, userId, categoryId) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    const res = await axios.get(
-      `${DB_URL}/${userId}/categories/${categoryId}/notes.json?auth=${idToken}`
-    );
-    const data = res.data
-      ? Object.keys(res.data).map((key) => ({ id: key, ...res.data[key] }))
-      : [];
+    const data = await getNotes(idToken, userId, categoryId);
     dispatch(setNotes(data));
   } catch (err) {
     dispatch(setError(err.message));
+    toast.error("Failed to load notes");
   } finally {
     dispatch(setLoading(false));
   }
 };
 
-// ✅ Add New Note
-export const createNote =
-  (idToken, userId, categoryId, note) => async (dispatch) => {
-    try {
-      dispatch(setLoading(true));
-      const res = await axios.post(
-        `${DB_URL}/${userId}/categories/${categoryId}/notes.json?auth=${idToken}`,
-        note
-      );
-      dispatch(addNote({ id: res.data.name, ...note }));
-    } catch (err) {
-      dispatch(setError(err.message));
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+export const createNote = (idToken, userId, categoryId, note) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+    const newNote = await addNoteAPI(idToken, userId, categoryId, note);
+    dispatch(addNote(newNote));
+    toast.success("Note added!");
+  } catch (err) {
+    dispatch(setError(err.message));
+    toast.error("Failed to add note");
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
 
-// ✅ Update Note
-export const updateNote =
+export const editNote =
   (idToken, userId, categoryId, noteId, updatedData) => async (dispatch) => {
     try {
       dispatch(setLoading(true));
-      await axios.patch(
-        `${DB_URL}/${userId}/categories/${categoryId}/notes/${noteId}.json?auth=${idToken}`,
-        updatedData
-      );
-      dispatch(updateNoteSlice({ id: noteId, ...updatedData }));
+      const updated = await updateNoteAPI(idToken, userId, categoryId, noteId, updatedData);
+      dispatch(updateNote(updated));
+      toast.success("Note updated!");
     } catch (err) {
       dispatch(setError(err.message));
+      toast.error("Failed to update note");
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-// ✅ Delete Note
 export const deleteNote =
   (idToken, userId, categoryId, noteId) => async (dispatch) => {
     try {
       dispatch(setLoading(true));
-      await axios.delete(
-        `${DB_URL}/${userId}/categories/${categoryId}/notes/${noteId}.json?auth=${idToken}`
-      );
+      await deleteNoteAPI(idToken, userId, categoryId, noteId);
       dispatch(removeNote(noteId));
+      toast.info("Note deleted");
     } catch (err) {
       dispatch(setError(err.message));
+      toast.error("Failed to delete note");
     } finally {
       dispatch(setLoading(false));
     }

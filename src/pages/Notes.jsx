@@ -1,0 +1,101 @@
+import { useEffect, useState } from "react";
+import { Button, Spinner, Row, Col } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
+import { fetchNotes, createNote, deleteNote, editNote } from "../redux/actions/noteActions";
+import NoteCard from "../components/cards/NoteCard";
+import AddNoteModal from "../components/modals/AddNoteModal";
+
+const Notes = () => {
+  const { id: categoryId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user, token } = useSelector((s) => s.auth);
+  const { notes, loading } = useSelector((s) => s.note);
+
+  const [showModal, setShowModal] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
+  const [editNoteId, setEditNoteId] = useState(null);
+
+  useEffect(() => {
+    if (token && user?.localId && categoryId)
+      dispatch(fetchNotes(token, user.localId, categoryId));
+  }, [dispatch, token, user, categoryId]);
+
+  const handleAddOrEditNote = (e) => {
+    e.preventDefault();
+    if (title.trim() && content.trim()) {
+      if (isEdit) {
+        dispatch(editNote(token, user.localId, categoryId, editNoteId, { title, content }));
+      } else {
+        dispatch(createNote(token, user.localId, categoryId, { title, content }));
+      }
+      setTitle("");
+      setContent("");
+      setShowModal(false);
+      setIsEdit(false);
+      setEditNoteId(null);
+    }
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Delete this note?"))
+      dispatch(deleteNote(token, user.localId, categoryId, id));
+  };
+
+  const handleEdit = (note) => {
+    setTitle(note.title);
+    setContent(note.content);
+    setEditNoteId(note.id);
+    setIsEdit(true);
+    setShowModal(true);
+  };
+
+  return (
+    <div className="container py-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex align-items-center gap-3">
+          <Button variant="outline-secondary" size="sm" onClick={() => navigate("/categories")}>
+            ← Back
+          </Button>
+          <h3 className="m-0">Notes</h3>
+        </div>
+        <Button onClick={() => setShowModal(true)}>+ Add Note</Button>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-5"><Spinner animation="border" /></div>
+      ) : notes.length > 0 ? (
+        <Row xs={1} sm={2} md={3} lg={4} className="g-3">
+          {notes.map((note) => (
+            <Col key={note.id}>
+              <NoteCard note={note} onDelete={handleDelete} onEdit={handleEdit} />
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <p className="text-center text-muted">No notes yet.</p>
+      )}
+
+      <AddNoteModal
+        show={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setIsEdit(false);
+          setTitle("");
+          setContent("");
+        }}
+        title={title}
+        setTitle={setTitle}
+        content={content}
+        setContent={setContent}
+        onSubmit={handleAddOrEditNote}
+        isEdit={isEdit}
+      />
+    </div>
+  );
+};
+
+export default Notes;
