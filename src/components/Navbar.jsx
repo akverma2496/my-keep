@@ -7,12 +7,15 @@ import ThemeToggle from "./ThemeToggle";
 const AppNavbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
   };
+
+  // ✅ Extract username (before '@')
+  const username = user?.email ? user.email.split("@")[0] : "";
 
   return (
     <Navbar bg="light" expand="md" className="shadow-sm">
@@ -23,10 +26,15 @@ const AppNavbar = () => {
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
-            <div className="d-flex align-items-center gap-3">
-              <ThemeToggle />
-            </div>
+          <Nav className="ms-auto d-flex align-items-center gap-3">
+            {isAuthenticated && (
+              <span className="fw-semibold text-muted">
+                👋 Hello, {username}
+              </span>
+            )}
+
+            <ThemeToggle />
+
             {isAuthenticated ? (
               <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
             ) : (
