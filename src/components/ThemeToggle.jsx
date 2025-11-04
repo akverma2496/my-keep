@@ -1,20 +1,23 @@
-// src/components/ThemeToggle.jsx
-import { ActionIcon, useMantineColorScheme } from "@mantine/core";
+import { ActionIcon, useMantineColorScheme, Group } from "@mantine/core";
 
 const ThemeToggle = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const isDark = colorScheme === "dark";
 
   return (
-    <ActionIcon
-      variant="outline"
-      color={isDark ? "yellow" : "blue"}
-      onClick={() => setColorScheme(isDark ? "light" : "dark")}
-      title="Toggle color scheme"
-      style={{ fontSize: "1.2rem" }}
-    >
-      {isDark ? "🌙" : "☀️"}
-    </ActionIcon>
+    <Group align="center" spacing="xs">
+      <ActionIcon
+        onClick={() => setColorScheme(isDark ? "light" : "dark")}
+        title="Toggle color scheme"
+        style={{
+          fontSize: "1.2rem",
+          backgroundColor: "transparent",
+          color: isDark ? "yellow" : "blue", 
+        }}
+      >
+        {isDark ? "🌙" : "☀️"}
+      </ActionIcon>
+    </Group>
   );
 };
 

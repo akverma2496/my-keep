@@ -10,7 +10,7 @@ const CategoryCard = ({ category, onDelete, onEdit, onClick }) => (
       <span className="fw-semibold">{category.name}</span>
       <div className="d-flex gap-2">
         <Button
-          variant="outline-primary"
+          variant="primary"
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
@@ -20,7 +20,7 @@ const CategoryCard = ({ category, onDelete, onEdit, onClick }) => (
           Edit
         </Button>
         <Button
-          variant="outline-danger"
+          variant="danger"
           size="sm"
           onClick={(e) => {
             e.stopPropagation();

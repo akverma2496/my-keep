@@ -10,12 +10,17 @@ import {
 } from "../redux/actions/categoryActions";
 import CategoryCard from "../components/cards/CategoryCard";
 import AddCategoryModal from "../components/modals/AddCategoryModal";
+import ConfirmModal from "../components/modals/ConfirmModal";
 
 const Categories = () => {
   const [showModal, setShowModal] = useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [isEdit, setIsEdit] = useState(false);
   const [editCategoryId, setEditCategoryId] = useState(null);
+
+  // For delete confirmation modal
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,15 +42,22 @@ const Categories = () => {
       dispatch(createCategory(token, user.localId, categoryName));
     }
 
-    setCategoryName("");
-    setShowModal(false);
-    setIsEdit(false);
-    setEditCategoryId(null);
+    resetForm();
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Delete this category?"))
-      dispatch(deleteCategory(token, user.localId, id));
+  // When delete button clicked
+  const handleDeleteClick = (id) => {
+    setCategoryToDelete(id);
+    setShowConfirm(true);
+  };
+
+  // When user confirms deletion
+  const confirmDelete = () => {
+    if (categoryToDelete) {
+      dispatch(deleteCategory(token, user.localId, categoryToDelete));
+      setCategoryToDelete(null);
+      setShowConfirm(false);
+    }
   };
 
   const handleEdit = (cat) => {
@@ -57,6 +69,13 @@ const Categories = () => {
 
   const handleCategoryClick = (id) => navigate(`/categories/${id}`);
 
+  const resetForm = () => {
+    setCategoryName("");
+    setShowModal(false);
+    setIsEdit(false);
+    setEditCategoryId(null);
+  };
+
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -65,14 +84,16 @@ const Categories = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-5"><Spinner animation="border" /></div>
+        <div className="text-center py-5">
+          <Spinner animation="border" />
+        </div>
       ) : categories.length > 0 ? (
         <Row xs={1} sm={2} md={3} lg={4} className="g-3">
           {categories.map((cat) => (
             <Col key={cat.id}>
               <CategoryCard
                 category={cat}
-                onDelete={handleDelete}
+                onDelete={() => handleDeleteClick(cat.id)} // ✅ triggers modal
                 onEdit={handleEdit}
                 onClick={() => handleCategoryClick(cat.id)}
               />
@@ -83,17 +104,22 @@ const Categories = () => {
         <p className="text-center text-muted">No categories yet.</p>
       )}
 
+      {/* Add/Edit Category Modal */}
       <AddCategoryModal
         show={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setIsEdit(false);
-          setCategoryName("");
-        }}
+        onClose={resetForm}
         onSubmit={handleAddOrEditCategory}
         categoryName={categoryName}
         setCategoryName={setCategoryName}
         isEdit={isEdit}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        show={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={confirmDelete}
+        message="Are you sure you want to delete this category?"
       />
     </div>
   );

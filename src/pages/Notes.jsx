@@ -1,4 +1,3 @@
-// src/pages/Notes.jsx
 import { useEffect, useState } from "react";
 import { Button, Spinner, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,6 +6,7 @@ import { fetchNotes, createNote, deleteNote, editNote } from "../redux/actions/n
 import NoteCard from "../components/cards/NoteCard";
 import AddNoteModal from "../components/modals/AddNoteModal";
 import ViewNoteModal from "../components/modals/ViewNoteModal";
+import ConfirmModal from "../components/modals/ConfirmModal";
 
 const Notes = () => {
   const { id: categoryId } = useParams();
@@ -22,6 +22,10 @@ const Notes = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  // New delete confirmation modal states
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState(null);
+
   useEffect(() => {
     if (token && user?.localId && categoryId)
       dispatch(fetchNotes(token, user.localId, categoryId));
@@ -36,13 +40,22 @@ const Notes = () => {
     } else {
       dispatch(createNote(token, user.localId, categoryId, { title, content }));
     }
-
     resetForm();
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Delete this note?"))
-      dispatch(deleteNote(token, user.localId, categoryId, id));
+  // When delete clicked
+  const handleDeleteClick = (id) => {
+    setNoteToDelete(id);
+    setShowConfirm(true);
+  };
+
+  // When delete confirmed
+  const confirmDelete = () => {
+    if (noteToDelete) {
+      dispatch(deleteNote(token, user.localId, categoryId, noteToDelete));
+      setNoteToDelete(null);
+      setShowConfirm(false);
+    }
   };
 
   const handleEdit = (note) => {
@@ -86,7 +99,7 @@ const Notes = () => {
             <Col key={note.id}>
               <NoteCard
                 note={note}
-                onDelete={handleDelete}
+                onDelete={() => handleDeleteClick(note.id)} // ← use new modal
                 onEdit={() => handleEdit(note)}
                 onView={() => handleView(note)}
               />
@@ -112,6 +125,13 @@ const Notes = () => {
         show={showViewModal}
         onClose={() => setShowViewModal(false)}
         note={selectedNote}
+      />
+
+      <ConfirmModal
+        show={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={confirmDelete}
+        message="Are you sure you want to delete this note?"
       />
     </div>
   );
