@@ -2,6 +2,7 @@ import { Navbar, Container, Nav } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
+import ThemeToggle from "./ThemeToggle";
 
 const AppNavbar = () => {
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ const AppNavbar = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
+            <div className="d-flex align-items-center gap-3">
+              <ThemeToggle />
+            </div>
             {isAuthenticated ? (
               <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
             ) : (
