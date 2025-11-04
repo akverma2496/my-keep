@@ -4,7 +4,6 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Categories from "../pages/Categories";
 import Notes from "../pages/Notes";
-import NotFound from "../pages/NotFound";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { Navigate } from "react-router-dom";
 
@@ -26,7 +25,7 @@ const AppRouter = () => (
       </Route>
 
       {/* Fallback */}
-      <Route path="*" element={<NotFound />} />
+      {/* <Route path="*" element={<NotFound />} /> */}
     </Route>
   </Routes>
 );

@@ -93,7 +93,7 @@ const Categories = () => {
             <Col key={cat.id}>
               <CategoryCard
                 category={cat}
-                onDelete={() => handleDeleteClick(cat.id)} // ✅ triggers modal
+                onDelete={() => handleDeleteClick(cat.id)} // triggers modal
                 onEdit={handleEdit}
                 onClick={() => handleCategoryClick(cat.id)}
               />

@@ -1,4 +1,3 @@
-// src/components/modals/AddNoteModal.jsx
 import { useEffect } from "react";
 import { Modal, Button, TextInput } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
@@ -17,11 +16,11 @@ const AddNoteModal = ({
 }) => {
   const editor = useEditor({
     extensions: [StarterKit],
-    content: "", // start empty, update later
+    content: "",
     onUpdate: ({ editor }) => setContent(editor.getHTML()),
   });
 
-  // ✅ Update editor content whenever we open modal for editing
+  // Update editor content whenever we open modal for editing
   useEffect(() => {
     if (editor && show) {
       editor.commands.setContent(content || "");

@@ -1,4 +1,3 @@
-// src/components/modals/ViewNoteModal.jsx
 import { useEffect } from "react";
 import { Modal } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
@@ -9,10 +8,10 @@ const ViewNoteModal = ({ show, onClose, note }) => {
   const editor = useEditor({
     extensions: [StarterKit],
     editable: false,
-    content: "", // initialize empty, then update later
+    content: "", 
   });
 
-  // ✅ Update content once modal is open & note changes
+  // Update content once modal is open & note changes
   useEffect(() => {
     if (editor && note?.content) {
       editor.commands.setContent(note.content);

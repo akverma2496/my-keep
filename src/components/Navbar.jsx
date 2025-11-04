@@ -19,7 +19,7 @@ const AppNavbar = () => {
 
   const username = user?.email ? user.email.split("@")[0] : "";
 
-  // 🔒 When user confirms logout
+  // When user confirms logout
   const confirmLogout = () => {
     dispatch(logout());
     setShowConfirm(false);
@@ -49,7 +49,7 @@ const AppNavbar = () => {
                 <Nav.Link
                   className="text-danger"
                   onClick={() => {
-                    setShowConfirm(true); // 🧱 show modal on click
+                    setShowConfirm(true); // show modal on click
                     handleNavItemClick();
                   }}
                 >
@@ -70,7 +70,6 @@ const AppNavbar = () => {
         </Container>
       </Navbar>
 
-      {/* ✅ Logout Confirmation Modal */}
       <ConfirmModal
         show={showConfirm}
         onClose={() => setShowConfirm(false)}

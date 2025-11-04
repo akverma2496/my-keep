@@ -2,7 +2,18 @@ import axios from "axios";
 
 const DB_URL = import.meta.env.VITE_DB_URL;
 
-// ✅ Get all notes for a category
+const getFormattedTimestamp = () => {
+  const now = new Date();
+  const time = now.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+  const date = now.toLocaleDateString("en-GB").replace(/\//g, "-");
+  return `${time} | ${date}`;
+};
+
+// Get all notes for a category
 export const getNotes = async (idToken, userId, categoryId) => {
   const res = await axios.get(
     `${DB_URL}/${userId}/categories/${categoryId}/notes.json?auth=${idToken}`
@@ -12,25 +23,38 @@ export const getNotes = async (idToken, userId, categoryId) => {
     : [];
 };
 
-// ✅ Add a new note
+// Add a new note
 export const addNoteAPI = async (idToken, userId, categoryId, note) => {
+  const newNote = {
+    ...note,
+    createdAt: getFormattedTimestamp(),
+    updatedAt: getFormattedTimestamp(),
+  };
+
   const res = await axios.post(
     `${DB_URL}/${userId}/categories/${categoryId}/notes.json?auth=${idToken}`,
-    note
+    newNote
   );
-  return { id: res.data.name, ...note };
+
+  return { id: res.data.name, ...newNote };
 };
 
-// ✅ Update note
+// Update note
 export const updateNoteAPI = async (idToken, userId, categoryId, noteId, updatedData) => {
+  const updatedNote = {
+    ...updatedData,
+    updatedAt: getFormattedTimestamp(),
+  };
+
   await axios.patch(
     `${DB_URL}/${userId}/categories/${categoryId}/notes/${noteId}.json?auth=${idToken}`,
-    updatedData
+    updatedNote
   );
-  return { id: noteId, ...updatedData };
+
+  return { id: noteId, ...updatedNote };
 };
 
-// ✅ Delete note
+// Delete note
 export const deleteNoteAPI = async (idToken, userId, categoryId, noteId) => {
   await axios.delete(
     `${DB_URL}/${userId}/categories/${categoryId}/notes/${noteId}.json?auth=${idToken}`

@@ -14,6 +14,7 @@ const Notes = () => {
   const navigate = useNavigate();
   const { user, token } = useSelector((s) => s.auth);
   const { notes, loading } = useSelector((s) => s.note);
+  const { categories } = useSelector((s) => s.category);
 
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -25,6 +26,8 @@ const Notes = () => {
   // New delete confirmation modal states
   const [showConfirm, setShowConfirm] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState(null);
+
+  const currentCategory = categories.find((c) => c.id === categoryId);
 
   useEffect(() => {
     if (token && user?.localId && categoryId)
@@ -86,7 +89,7 @@ const Notes = () => {
           <Button variant="outline-secondary" size="sm" onClick={() => navigate("/categories")}>
             ← Back
           </Button>
-          <h3 className="m-0">Notes</h3>
+          <h3 className="m-0">{currentCategory?.name} Notes</h3>
         </div>
         <Button onClick={() => setShowModal(true)}>+ Add Note</Button>
       </div>
@@ -99,7 +102,7 @@ const Notes = () => {
             <Col key={note.id}>
               <NoteCard
                 note={note}
-                onDelete={() => handleDeleteClick(note.id)} // ← use new modal
+                onDelete={() => handleDeleteClick(note.id)} // use new modal
                 onEdit={() => handleEdit(note)}
                 onView={() => handleView(note)}
               />
