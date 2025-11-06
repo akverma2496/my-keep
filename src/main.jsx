@@ -7,6 +7,8 @@ import store from './redux/store.js';
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/tiptap/styles.css";
+import "prosemirror-view/style/prosemirror.css";
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
