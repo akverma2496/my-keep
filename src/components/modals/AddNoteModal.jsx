@@ -26,7 +26,7 @@ const AddNoteModal = ({
   // Update editor content whenever we open modal for editing
   useEffect(() => {
     if (editor && show) {
-      editor.commands.setContent(content || ""); // Set content if it's open in edit mode
+      editor.commands.setContent(content || "<p>&nbsp;</p>"); // Set content if it's open in edit mode
     }
   }, [editor, show, content]);
 
