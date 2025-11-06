@@ -31,6 +31,7 @@ const AddNoteModal = ({
     <Modal
       opened={show}
       onClose={onClose}
+      trapFocus={false}
       centered
       title={isEdit ? "Edit Note" : "Add Note"}
       size="lg"

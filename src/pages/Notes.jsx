@@ -121,8 +121,7 @@ const Notes = () => {
         content={content}
         setContent={setContent}
         onSubmit={handleAddNote}
-        isEdit={isEdit}
-        trapFocus={false} 
+        isEdit={isEdit} 
       />
 
       <ViewNoteModal
