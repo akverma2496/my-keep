@@ -16,14 +16,17 @@ const AddNoteModal = ({
 }) => {
   const editor = useEditor({
     extensions: [StarterKit],
-    content: "",
-    onUpdate: ({ editor }) => setContent(editor.getHTML()),
+    content: content, // Directly set initial content to prevent state conflict
+    onUpdate: ({ editor }) => {
+      const updatedContent = editor.getHTML();
+      setContent(updatedContent); // Update the content state on each change
+    },
   });
 
   // Update editor content whenever we open modal for editing
   useEffect(() => {
     if (editor && show) {
-      editor.commands.setContent(content || "");
+      editor.commands.setContent(content || ""); // Set content if it's open in edit mode
     }
   }, [editor, show, content]);
 
@@ -31,7 +34,6 @@ const AddNoteModal = ({
     <Modal
       opened={show}
       onClose={onClose}
-      trapFocus={false}
       centered
       title={isEdit ? "Edit Note" : "Add Note"}
       size="lg"
