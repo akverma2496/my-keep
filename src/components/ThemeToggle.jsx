@@ -1,23 +1,19 @@
-import { ActionIcon, useMantineColorScheme, Group } from "@mantine/core";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../redux/slices/themeSlice";
+import { Button } from "react-bootstrap";
 
 const ThemeToggle = () => {
-  const { colorScheme, setColorScheme } = useMantineColorScheme();
-  const isDark = colorScheme === "dark";
+  const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme.theme);
 
   return (
-    <Group align="center" spacing="xs">
-      <ActionIcon
-        onClick={() => setColorScheme(isDark ? "light" : "dark")}
-        title="Toggle color scheme"
-        style={{
-          fontSize: "1.2rem",
-          backgroundColor: "transparent",
-          color: isDark ? "yellow" : "blue", 
-        }}
-      >
-        {isDark ? "🌙" : "☀️"}
-      </ActionIcon>
-    </Group>
+    <Button
+      variant={theme === "dark" ? "secondary" : "outline-secondary"}
+      size="sm"
+      onClick={() => dispatch(toggleTheme())}
+    >
+      {theme === "dark" ? "🌞 Light Mode" : "🌙 Dark Mode"}
+    </Button>
   );
 };
 

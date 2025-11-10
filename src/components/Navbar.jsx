@@ -3,13 +3,14 @@ import { Navbar, Container, Nav } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
-import ThemeToggle from "./ThemeToggle";
 import ConfirmModal from "../components/modals/ConfirmModal";
+import ThemeToggle from "./ThemeToggle";
 
 const AppNavbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const theme = useSelector((state) => state.theme.theme);
 
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -28,7 +29,7 @@ const AppNavbar = () => {
 
   return (
     <>
-      <Navbar bg="light" expand="md" className="shadow-sm">
+      <Navbar bg={theme} expand="md" className="shadow-sm">
         <Container>
           <Navbar.Brand as={Link} to="/categories">
             🗒️ My Keep

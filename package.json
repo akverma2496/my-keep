@@ -10,22 +10,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mantine/core": "^8.3.6",
-    "@mantine/hooks": "^8.3.6",
-    "@mantine/tiptap": "^8.3.6",
     "@reduxjs/toolkit": "^2.9.2",
     "@tiptap/react": "^3.10.1",
     "@tiptap/starter-kit": "^3.10.1",
     "axios": "^1.13.1",
     "bootstrap": "^5.3.8",
-    "prosemirror-view": "^1.41.3",
-    "react": "^19.1.1",
+    "draft-js": "^0.11.7",
+    "react": "^18.3.1",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^19.1.1",
+    "react-dom": "^18.3.1",
+    "react-quill": "^2.0.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.5",
     "react-toastify": "^11.0.5",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "slate": "^0.118.1",
+    "slate-history": "^0.113.1",
+    "slate-hyperscript": "^0.100.0",
+    "slate-react": "^0.118.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

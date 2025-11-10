@@ -1,36 +1,39 @@
-import { useEffect } from "react";
-import { Modal } from "@mantine/core";
-import { RichTextEditor } from "@mantine/tiptap";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import React, { useEffect } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { Modal, Button } from 'react-bootstrap';
 
 const ViewNoteModal = ({ show, onClose, note }) => {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    editable: false,
-    content: "", 
-  });
+  const [editorContent, setEditorContent] = React.useState('');
 
-  // Update content once modal is open & note changes
   useEffect(() => {
-    if (editor && note?.content) {
-      editor.commands.setContent(note.content);
+    if (show && note?.content) {
+      setEditorContent(note.content);
     }
-  }, [editor, note, show]);
+  }, [show, note]);
 
   return (
-    <Modal
-      opened={show}
-      onClose={onClose}
-      centered
-      title={note?.title || "View Note"}
-      size="lg"
-    >
-      {editor && (
-        <RichTextEditor editor={editor}>
-          <RichTextEditor.Content />
-        </RichTextEditor>
-      )}
+    <Modal show={show} onHide={onClose} centered size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>{note?.title || 'View Note'}</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        <div className="editor-container" style={{ marginTop: '20px' }}>
+          <ReactQuill
+            value={editorContent}
+            theme="snow"
+            readOnly
+            modules={{ toolbar: false }}
+          />
+        </div>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onClose}>
+          Close
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };

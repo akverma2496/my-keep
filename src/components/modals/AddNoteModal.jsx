@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { Modal, Button, TextInput } from "@mantine/core";
-import { RichTextEditor } from "@mantine/tiptap";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import React, { useEffect } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { useState, useRef } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
 
 const AddNoteModal = ({
   show,
@@ -14,70 +14,69 @@ const AddNoteModal = ({
   onSubmit,
   isEdit = false,
 }) => {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: content, // Directly set initial content to prevent state conflict
-    onUpdate: ({ editor }) => {
-      const updatedContent = editor.getHTML();
-      setContent(updatedContent); // Update the content state on each change
-    },
-  });
+  const quillRef = useRef(null);
 
-  // Update editor content whenever we open modal for editing
+  const handleEditorChange = (value) => {
+    setContent(value);
+  };
+
   useEffect(() => {
-    if (editor && show) {
-      editor.commands.setContent(content || "<p>&nbsp;</p>"); // Set content if it's open in edit mode
+    if (!isEdit && show) {
+      // Clear the fields if it's a new note (not in edit mode)
+      setTitle('');
+      setContent('');
     }
-  }, [editor, show, content]);
+  }, [show, isEdit, setTitle, setContent]);
+
+  // Update the editor content when the modal opens in edit mode
+  useEffect(() => {
+    if (isEdit && show && content) {
+      // Set content for editing when the modal is shown in edit mode
+      setContent(content);
+      setTitle(title); // Set title for editing
+    }
+  }, [show, content, title, isEdit, setContent, setTitle]);
 
   return (
-    <Modal
-      opened={show}
-      onClose={onClose}
-      centered
-      title={isEdit ? "Edit Note" : "Add Note"}
-      size="lg"
-    >
-      <form onSubmit={onSubmit}>
-        <TextInput
-          placeholder="Enter title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          mb="md"
-        />
+    <Modal show={show} onHide={onClose} centered size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>{isEdit ? 'Edit Note' : 'Add Note'}</Modal.Title>
+      </Modal.Header>
 
-        {editor && (
-          <RichTextEditor editor={editor}>
-            <RichTextEditor.Toolbar sticky>
-              <RichTextEditor.ControlsGroup>
-                <RichTextEditor.Bold />
-                <RichTextEditor.Italic />
-                <RichTextEditor.Underline />
-                <RichTextEditor.Strikethrough />
-              </RichTextEditor.ControlsGroup>
-              <RichTextEditor.ControlsGroup>
-                <RichTextEditor.H1 />
-                <RichTextEditor.H2 />
-                <RichTextEditor.H3 />
-              </RichTextEditor.ControlsGroup>
-              <RichTextEditor.ControlsGroup>
-                <RichTextEditor.Blockquote />
-                <RichTextEditor.BulletList />
-                <RichTextEditor.OrderedList />
-              </RichTextEditor.ControlsGroup>
-            </RichTextEditor.Toolbar>
-            <RichTextEditor.Content />
-          </RichTextEditor>
-        )}
+      <Modal.Body>
+        <Form onSubmit={onSubmit}>
+          {/* Title Input */}
+          <Form.Group controlId="noteTitle">
+            <Form.Label>Title</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </Form.Group>
 
-        <div className="d-flex justify-content-end mt-3 gap-2">
-          <Button variant="default" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit">{isEdit ? "Update" : "Add"}</Button>
-        </div>
-      </form>
+          {/* ReactQuill Editor */}
+          <div className="editor-container" style={{ marginTop: '20px' }}>
+            <ReactQuill
+              ref={quillRef}
+              value={content}
+              onChange={handleEditorChange}
+              theme="snow"
+            />
+          </div>
+        </Form>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button type="submit" onClick={onSubmit} variant="primary">
+          {isEdit ? 'Update' : 'Add'}
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };
