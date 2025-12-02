@@ -6,6 +6,7 @@ import Categories from "../pages/Categories";
 import Notes from "../pages/Notes";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { Navigate } from "react-router-dom";
+import Archive from "../pages/Archive";
 
 const AppRouter = () => (
   <Routes>
@@ -22,6 +23,7 @@ const AppRouter = () => (
       <Route element={<ProtectedRoute />}>
         <Route path="categories" element={<Categories />} />
         <Route path="categories/:id" element={<Notes />} />
+        <Route path="/archive" element={<Archive />} />
       </Route>
 
       {/* Fallback */}

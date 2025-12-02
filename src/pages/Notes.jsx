@@ -2,7 +2,17 @@ import { useEffect, useState } from "react";
 import { Button, Spinner, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchNotes, createNote, deleteNote, editNote } from "../redux/actions/noteActions";
+import { MdAdd } from "react-icons/md";
+import { 
+  fetchNotes, 
+  createNote, 
+  deleteNote, 
+  editNote, 
+  changeNoteColor, 
+  archiveNoteAsync,
+  unarchiveNoteAsync
+} from "../redux/actions/noteActions";
+
 import NoteCard from "../components/cards/NoteCard";
 import AddNoteModal from "../components/modals/AddNoteModal";
 import ViewNoteModal from "../components/modals/ViewNoteModal";
@@ -12,9 +22,13 @@ const Notes = () => {
   const { id: categoryId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { user, token } = useSelector((s) => s.auth);
   const { notes, loading } = useSelector((s) => s.note);
   const { categories } = useSelector((s) => s.category);
+
+  // ⬇️ NEW: Search query from Redux
+  const searchQuery = useSelector((state) => state.search.query);
 
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -22,16 +36,17 @@ const Notes = () => {
   const [selectedNote, setSelectedNote] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isHovered, setIsHovered] = useState(false);
 
-  // New delete confirmation modal states
   const [showConfirm, setShowConfirm] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState(null);
 
   const currentCategory = categories.find((c) => c.id === categoryId);
 
   useEffect(() => {
-    if (token && user?.localId && categoryId)
+    if (token && user?.localId && categoryId) {
       dispatch(fetchNotes(token, user.localId, categoryId));
+    }
   }, [dispatch, token, user, categoryId]);
 
   const handleAddNote = (e) => {
@@ -39,20 +54,26 @@ const Notes = () => {
     if (!title.trim() || !content.trim()) return;
 
     if (isEdit && selectedNote) {
-      dispatch(editNote(token, user.localId, categoryId, selectedNote.id, { title, content }));
+      dispatch(
+        editNote(token, user.localId, categoryId, selectedNote.id, { title, content })
+      );
     } else {
-      dispatch(createNote(token, user.localId, categoryId, { title, content }));
+      dispatch(
+        createNote(token, user.localId, categoryId, { title, content })
+      );
     }
     resetForm();
   };
 
-  // When delete clicked
+  const handleColorChange = (noteId, color) => {
+    dispatch(changeNoteColor(token, user.localId, categoryId, noteId, color));
+  };
+
   const handleDeleteClick = (id) => {
     setNoteToDelete(id);
     setShowConfirm(true);
   };
 
-  // When delete confirmed
   const confirmDelete = () => {
     if (noteToDelete) {
       dispatch(deleteNote(token, user.localId, categoryId, noteToDelete));
@@ -82,35 +103,92 @@ const Notes = () => {
     setShowModal(false);
   };
 
+  // const filteredNotes = notes.filter(
+  //   (note) =>
+  //     note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     note.content.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+
+  const filteredNotes = notes
+  .filter((note) => !note.isArchived) // <-- only showing notes that are NOT archived
+  .filter(
+    (note) =>
+      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // const filteredNotes = notes
+  // .filter((note) => !note.isArchived) // First filter out archived notes
+  // .filter(
+  //   (note) =>
+  //     note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     note.content.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div className="d-flex align-items-center gap-3">
-          <Button variant="outline-secondary" size="sm" onClick={() => navigate("/categories")}>
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() => navigate("/categories")}
+          >
             ← Back
           </Button>
           <h3 className="m-0">{currentCategory?.name} Notes</h3>
         </div>
-        <Button onClick={() => setShowModal(true)}>+ Add Note</Button>
+
+        {/* Expandable Add Button */}
+        <button
+          onClick={() => setShowModal(true)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="btn btn-secondary d-flex align-items-center gap-2 border-0"
+          style={{
+            borderRadius: "50px",
+            padding: "10px",
+            transition: "all 0.3s ease",
+            width: isHovered ? "auto" : "44px",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <MdAdd size={24} style={{ flexShrink: 0 }} />
+          <span
+            style={{
+              opacity: isHovered ? 1 : 0,
+              transition: "opacity 0.3s ease",
+              paddingRight: isHovered ? "12px" : "0",
+            }}
+          >
+            Add Note
+          </span>
+        </button>
       </div>
 
       {loading ? (
-        <div className="text-center py-5"><Spinner animation="border" /></div>
-      ) : notes.length > 0 ? (
+        <div className="text-center py-5">
+          <Spinner animation="border" />
+        </div>
+      ) : filteredNotes.length > 0 ? (
         <Row xs={1} sm={2} md={3} lg={4} className="g-3">
-          {notes.map((note) => (
+          {filteredNotes.map((note) => (
             <Col key={note.id}>
               <NoteCard
                 note={note}
-                onDelete={() => handleDeleteClick(note.id)} // use new modal
+                onDelete={() => handleDeleteClick(note.id)}
                 onEdit={() => handleEdit(note)}
                 onView={() => handleView(note)}
+                onColorChange={handleColorChange}
+                onArchive={(noteId) => dispatch(archiveNoteAsync(token, user.localId, categoryId, noteId))}
+                //onArchive={(noteId) => dispatch(unarchiveNoteAsync(token, user.localId, categoryId, noteId))}
               />
             </Col>
           ))}
         </Row>
       ) : (
-        <p className="text-center text-muted">No notes yet.</p>
+        <p className="text-center text-muted">No notes found.</p>
       )}
 
       <AddNoteModal
@@ -121,7 +199,7 @@ const Notes = () => {
         content={content}
         setContent={setContent}
         onSubmit={handleAddNote}
-        isEdit={isEdit} 
+        isEdit={isEdit}
       />
 
       <ViewNoteModal

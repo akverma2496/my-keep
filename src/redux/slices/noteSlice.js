@@ -28,9 +28,24 @@ const noteSlice = createSlice({
     setError: (s, a) => {
       s.error = a.payload;
     },
+    archiveNote: (state, action) => {
+  const noteId = action.payload;
+  const note = state.notes.find((n) => n.id === noteId);
+  if (note) {
+    note.isArchived = true;
+  }
+},
+
+    unarchiveNote: (state, action) => {
+  const noteId = action.payload;
+  const note = state.notes.find((n) => n.id === noteId);
+  if (note) {
+    note.isArchived = false;
+  }
+},
   },
 });
 
-export const { setNotes, addNote, removeNote, updateNote, setLoading, setError } =
+export const { setNotes, addNote, removeNote, updateNote, setLoading, setError, archiveNote, unarchiveNote } =
   noteSlice.actions;
 export default noteSlice.reducer;

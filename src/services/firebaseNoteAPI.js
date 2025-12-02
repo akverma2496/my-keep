@@ -25,32 +25,32 @@ export const getNotes = async (idToken, userId, categoryId) => {
 
 // Add a new note
 export const addNoteAPI = async (idToken, userId, categoryId, note) => {
+  const timestamp = getFormattedTimestamp();
   const newNote = {
     ...note,
-    createdAt: getFormattedTimestamp(),
-    updatedAt: getFormattedTimestamp(),
+    createdAt: timestamp,
+    updatedAt: timestamp, // Same as createdAt on creation
+    color: note.color || "#FFFFFF", // Default color
   };
-
   const res = await axios.post(
     `${DB_URL}/${userId}/categories/${categoryId}/notes.json?auth=${idToken}`,
     newNote
   );
-
   return { id: res.data.name, ...newNote };
 };
 
 // Update note
 export const updateNoteAPI = async (idToken, userId, categoryId, noteId, updatedData) => {
+  const timestamp = getFormattedTimestamp();
   const updatedNote = {
     ...updatedData,
-    updatedAt: getFormattedTimestamp(),
+    updatedAt: timestamp,
   };
-
   await axios.patch(
     `${DB_URL}/${userId}/categories/${categoryId}/notes/${noteId}.json?auth=${idToken}`,
     updatedNote
   );
-
+  // Return only the fields that were updated (including the new updatedAt)
   return { id: noteId, ...updatedNote };
 };
 
@@ -59,4 +59,22 @@ export const deleteNoteAPI = async (idToken, userId, categoryId, noteId) => {
   await axios.delete(
     `${DB_URL}/${userId}/categories/${categoryId}/notes/${noteId}.json?auth=${idToken}`
   );
+};
+
+
+export const archiveNoteAPI = async (idToken, userId, categoryId, noteId) => {
+  await axios.patch(
+    `${DB_URL}/${userId}/categories/${categoryId}/notes/${noteId}.json?auth=${idToken}`,
+    { isArchived: true }
+  );
+  return { id: noteId, isArchived: true };
+};
+
+// Unarchive note
+export const unarchiveNoteAPI = async (idToken, userId, categoryId, noteId) => {
+  await axios.patch(
+    `${DB_URL}/${userId}/categories/${categoryId}/notes/${noteId}.json?auth=${idToken}`,
+    { isArchived: false }
+  );
+  return { id: noteId, isArchived: false };
 };
